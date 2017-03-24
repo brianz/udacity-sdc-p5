@@ -1,3 +1,11 @@
+CarND-Vehicle-Detection
+
+__MACOSX
+*.swp
+*.zip
+vehicles/
+non-vehicles/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
