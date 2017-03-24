@@ -1,0 +1,10 @@
+cycler==0.10.0
+matplotlib==2.0.0
+numpy==1.12.1
+olefile==0.44
+opencv-python==3.2.0.6
+Pillow==4.0.0
+pyparsing==2.2.0
+python-dateutil==2.6.0
+pytz==2016.10
+six==1.10.0
