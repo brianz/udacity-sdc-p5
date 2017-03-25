@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 from skimage.feature import hog
 
-def _get_hog_features(img, orient, pix_per_cell, cell_per_block,
+def _calculate_hog(img, orient, pix_per_cell, cell_per_block,
                         vis=False, feature_vec=True):
     return hog(img, orientations=orient,
               pixels_per_cell=(pix_per_cell, pix_per_cell),
@@ -16,11 +16,11 @@ def get_hog_features(img, channel=0, **kwargs):
     if channel == 'ALL':
         hog_features = []
         for channel in range(img.shape[2]):
-            features = get_hog_features(img[:,:,channel], vis=False, feature_vec=True, **kwargs)
+            features = _calculate_hog(img[:,:,channel], vis=False, feature_vec=True, **kwargs)
             hog_features.append(features)
         hog_features = np.ravel(hog_features)
     else:
-        hog_features = get_hog_features(img[:,:,channel], vis=False, feature_vec=True, **kwargs)
+        hog_features = _calculate_hog(img[:,:,channel], vis=False, feature_vec=True, **kwargs)
 
     return hog_features
 
@@ -35,6 +35,13 @@ def color_hist(img, nbins=32, bins_range=(0, 256)):
     channel2_hist = np.histogram(img[:,:,1], bins=nbins, range=bins_range)
     channel3_hist = np.histogram(img[:,:,2], bins=nbins, range=bins_range)
     return np.concatenate((channel1_hist[0], channel2_hist[0], channel3_hist[0]))
+
+from scipy import misc
+
+img = mpimg.imread('test_images/test1.jpg')
+img = img.astype(np.float32) / 255
+#image = misc.imread('test_images/test1.jpg')
+print(color_hist(img))
 
 _spaces = {
     'hsv': cv2.COLOR_RGB2HSV,
@@ -54,7 +61,7 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
         file_features = []
         img = mpimg.imread(fn)
 
-        cv2_cspace = _spaces.get(cspace.lower())
+        cv2_cspace = _spaces.get(color_space.lower())
         feature_image = cv2.cvtColor(img, cv2_cspace) if cv2_cspace else np.copy(img)
 
         if spatial_feat:
@@ -69,7 +76,7 @@ def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
                     'pix_per_cell': pix_per_cell,
                     'cell_per_block': cell_per_block,
             }
-            file_features.append(hog_features(feature_image, hog_channel, **kwargs)
+            file_features.append(get_hog_features(feature_image, hog_channel, **kwargs))
 
         features.append(np.concatenate(file_features))
 
