@@ -6,6 +6,8 @@ __MACOSX
 *.zip
 vehicles/
 non-vehicles/
+*.p
+mpl3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
