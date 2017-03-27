@@ -23,7 +23,7 @@ The goals / steps of this project are the following:
 
 ## Histogram of Oriented Gradients (HOG)
 
-I extractd HOG features using the following paramters.  This can be found in the functions
+I extracted HOG features using the following parameters.  This can be found in the functions
 `get_hog_features` and `_calculate_hog` in the Jupyter Notebook:
 
 - `color_space = 'YCrCb'`
@@ -40,7 +40,7 @@ Below is a visualization of the HOG features from a single image:
 
 ![hog features image](solution-images/hog-features.png)
 
-Taking a look at a distribution of the hog features showed comporable results between gray and
+Taking a look at a distribution of the hog features showed comparable results between gray and
 YCrCb...this distribution was similar across various color spaces.
 
 ![hog image histogram](solution-images/hog-histogram.png)
@@ -59,7 +59,7 @@ permutations of features, including:
 At the end of all this, I was getting the best results with *all* features being used, HOG +
 spatial + color.
 
-The function `extract_features` is the entrypoint for extracting features for a list of images.  A
+The function `extract_features` is the entry-point for extracting features for a list of images.  A
 helper function named `single_img_features` can be used for testing on a single image.
 
 To train the SVM I have a single function called `train`. This function uses all of the global
@@ -108,7 +108,7 @@ function.
 I performed all of this imperially by:
 
 1. taking a best guess
-2. testing on subsampled video
+2. testing on sub-sampled video
 3. making changes to the window parameters
 4. back to 2
 
@@ -122,22 +122,14 @@ easier to differentiate the boxes.
 
 ![sliding windows](solution-images/boxes.png)
 
-This is a larger view of the `reall_far` scanning region:
+This is a larger view of the `really_far` scanning region:
 
 ![sliding windows boxes-really-far](solution-images/boxes-really-far.png)
 
-Below are some examples of the sliding windows...all of the boxes are drawn in the first column
-while the second column consists of the "final" boxes after heatmap and thresholding:
-
-![sliding windows results](solution-images/sample-frame01.png)
-![sliding windows results](solution-images/sample-frame02.png)
-![sliding windows results](solution-images/sample-frame03.png)
-![sliding windows results](solution-images/sample-frame04.png)
-
 In the pipeline I used a heatmap where every pixel contained within a bounding box was incremented
-by 1.  Becuase I'm scanning with multiple sized boxes and because there is overlap a car would get
+by 1.  Because I'm scanning with multiple sized boxes and because there is overlap a car would get
 "hit" by a box multiple times, typically.  From time to time there would be a false-positive
-in a random location. The headmap would produce an image which would get brighter as there were
+in a random location. The heatmap would produce an image which would get brighter as there were
 more "hits".
 
 I applied a threshold of `3` to keep any regions meaning there had to be at least three
@@ -146,7 +138,8 @@ I applied a threshold of `3` to keep any regions meaning there had to be at leas
 Once the thresholding was applied I used the `label` function from `scipy` to determine the final areas
 of interest and the bounding boxes for the final boxes.
 
-Here are a few frames and their corresponding heatmaps:
+Here are a few frames and their corresponding heatmaps. In all images below the first column
+displays all of the detected car images or "hits" for a particular box during the sliding window:
 
 ![heatmap](solution-images/boxes-heatmap01.png)
 ![heatmap](solution-images/boxes-heatmap02.png)
@@ -160,6 +153,22 @@ Here is the output of `scipy.ndimage.measurements.label()` on the integrated hea
 ![label](solution-images/boxes-label03.png)
 ![label](solution-images/boxes-label04.png)
 
+Below are some examples of the final results...all of the boxes are drawn in the first column
+while the second column consists of the "final" boxes after heatmap and thresholding:
+
+![sliding windows results](solution-images/sample-frame01.png)
+![sliding windows results](solution-images/sample-frame02.png)
+![sliding windows results](solution-images/sample-frame03.png)
+![sliding windows results](solution-images/sample-frame04.png)
+
+
 ## Discussion
 
+I found that it was critical to get the right number and size of scanning windows. I went through
+various permutations and had choppy videos at the beginning due to too many small windows.  After a
+few iterations I found better results by doing many overlapping scans in the mid-range of the box sizes.
+
+As seen in the example sliding windows, I scan from the left to the right which ends up stopping
+short of the right edge of the frame. This results in the cars not being detected until they are in
+clear view.  It could help to add some additional scanning from the right to the left.
 
